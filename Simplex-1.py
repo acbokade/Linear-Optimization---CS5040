@@ -1,14 +1,31 @@
 import numpy as np
 
-def find_initial(N, M, A, B, C) : 
+def simplex_phase1(N, M, A, B, C) : 
     # fill the code here and remove the return below
-    return A,B 
+    for i in range(M):
+        A.append(B[i])
+    X=[0]*N
+    X.append(1)
+    T=X
+    tight_constraints = check_tight(N+1,M,A,B,X)
+    extreme_pt = simplex_phase2(X,tight_constraints, N+1, M, A, B, T)
+    
+    return extreme_pt
+ 
+def check_tight(N,M,A,B,X):
+    tight=[]
+    for i in range(M):
+        temp = 0
+        for j in range(N):
+            temp = temp +A[i][j]*X[j]
+        if temp ==B[i]:
+            tight.append(True)
+        else:
+            tight.append(False)
+            
+    return tight       
 
-def Simplex(N, M, A, B, C):
-
-    # find initial feasible solution
-    # X is initial point and tight_constraints is boolean vector indicating which constraints are tight
-    X, tight_constaints = find_initial(N, M, A, B, C)
+def simplex_phase2(X,tight_constraints, N, M, A, B, C):
     optimal_cost = np.dot(C,X)
     flag = -1
 
@@ -23,7 +40,7 @@ def Simplex(N, M, A, B, C):
         tight_ind = 0
         untight_ind = 0
         for i in range(M):
-            if tight_constaints[i]:
+            if tight_constraints[i]:
                 a_tight.append(A[i])
                 b_tight.append(B[i])
                 tight_index_map[tight_ind] = i
@@ -62,12 +79,40 @@ def Simplex(N, M, A, B, C):
                     t=temp
                     index_replace=i
             X=X+dir_vect*t
-            tight_constaints[untight_index_map[index_replace]] = True # untight becomes tight
-            tight_constaints[tight_index_map[index]] = False # tight becomes untight
+            tight_constraints[untight_index_map[index_replace]] = True # untight becomes tight
+            tight_constraints[tight_index_map[index]] = False # tight becomes untight
 
 
     if flag==1 :
-        print("Optimal Cost is" + optimal_cost + " at :" + X)
+#         print("Optimal Cost is" + optimal_cost + " at :" + X)
+        return X
+
+def Simplex(N, M, A, B, C):
+
+    # find initial feasible solution
+    # X is initial point and tight_constraints is boolean vector indicating which constraints are tight
+    
+    trivial=1
+    for i in range(M):
+        if B[i] < 0:
+            trivial=0
+    if trivial == 1:
+        X=[0]*N
+    else:
+        X= simplex_phase1(N, M, A, B, C)
+        if X[N+1] == 0:
+            X = X[:N]
+        else:
+            print("Original problem is infeasible")
+    
+    
+    tight_constraints = check_tight(N,M,A,B,X)
+    
+    optimal_pt =  simplex_phase2(X,tight_constraints, N, M, A, B, C)
+#     print (optimal_pt,C)
+#     print("Optimal Cost is" + np.dot(C,optimal_pt) + " at :" + optimal_pt)
+    
+
 
 
 
@@ -92,4 +137,9 @@ if __name__ == "__main__":
     print(A)
     print(B)
     print(C)
-    Simplex(N, M, A,B,C)
+#     N=3
+#     M=7
+#     A = [[-1 ,0,0],[0,-1,0],[0,0,-1],[1,0,0],[0,1,0],[0,0,1],[1,1,1]]
+#     B = [0,0,0,2,2,2,5]
+#     C= [1,1,-1]
+#     Simplex(N, M, A,B,C)
