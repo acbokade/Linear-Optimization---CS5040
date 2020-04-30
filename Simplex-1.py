@@ -1,17 +1,81 @@
 import numpy as np
 
 def simplex_phase1(N, M, A, B, C) : 
-    # fill the code here and remove the return below
+
+    arr=[]
     for i in range(M):
-        A[i].append(B[i])
-    X=[0]*N
-    X.append(1)
-    T=X
-    tight_constraints = check_tight(N+1,M,A,B,X)
-    extreme_pt = simplex_phase2(X,tight_constraints, N+1, M, A, B, T)
-    
+        arr.append(i)
+    data = [0]*N
+    global extreme_pt
+    combinationUtil(arr, data, 0,M - 1, 0, N, N, M, A, B, C);
     return extreme_pt
- 
+
+
+def isvalid(data, N, M, A, B, C):
+    global extreme_pt
+    mat = []
+    tempb = []
+    for i in range (N):
+        mat.append(A[data[i]])
+        tempb.append(B[data[i]])
+    mat = np.array(mat, dtype='float')
+    tempb = np.array(tempb, dtype='float')
+
+    print(mat)
+    if abs(np.linalg.det(mat)-0)<1e-5:
+        return (False)
+
+    matinverse= np.linalg.inv(mat)
+
+    sol = np.dot(matinverse,tempb)
+    
+    tempmul = np.dot(A,sol)
+    print(tempmul)
+    for i in range(M):
+        if (B[i]-tempmul[i] < 0):
+          return False
+    extreme_pt = sol    
+    return (True)
+    
+
+def combinationUtil(arr, data, start,  
+                    end, index, r, N, M, A, B, C): 
+                            
+    # Current combination is ready  
+    # to be printed, print it 
+    global extreme_pt
+    if len(extreme_pt)!=0:
+        return
+    
+    if index == r: 
+        print(data)
+        print("end\n")
+        isvalid(data, N, M, A, B, C)
+       
+        print()
+        return 
+                
+                
+            
+    
+  
+    # replace index with all 
+    # possible elements. The 
+    # condition "end-i+1 >=  
+    # r-index" makes sure that  
+    # including one element at 
+    # index will make a combination  
+    # with remaining elements at  
+    # remaining positions 
+    i = start;  
+    while(i <= end and end - i + 1 >= r - index): 
+        data[index] = arr[i]; 
+        combinationUtil(arr, data, i + 1,  
+                        end, index + 1, r, N, M, A, B, C); 
+        i += 1; 
+
+
+
 def check_tight(N,M,A,B,X):
     tight=[]
     for i in range(M):
@@ -84,14 +148,13 @@ def simplex_phase2(X,tight_constraints, N, M, A, B, C):
 
 
     if flag==1 :
-#         print("Optimal Cost is" + optimal_cost + " at :" + X)
+        # print("Optimal Cost is" + optimal_cost + " at :" + X)
         return X
 
 def Simplex(N, M, A, B, C):
 
     # find initial feasible solution
-    # X is initial point and tight_constraints is boolean vector indicating which constraints are tight
-    
+    # X is initial point and tight_constraints is boolean vector indicating which constraints are tight 
     trivial=1
     for i in range(M):
         if B[i] < 0:
@@ -100,16 +163,15 @@ def Simplex(N, M, A, B, C):
         X=[0]*N
     else:
         X= simplex_phase1(N, M, A, B, C)
-        if X[N+1] == 0:
-            X = X[:N]
-        else:
+        if (len(X)==0):
             print("Original problem is infeasible")
+            return
     
     
     tight_constraints = check_tight(N,M,A,B,X)
     
     optimal_pt =  simplex_phase2(X,tight_constraints, N, M, A, B, C)
-#     print (optimal_pt,C)
+    print (optimal_pt,C)
 #     print("Optimal Cost is" + np.dot(C,optimal_pt) + " at :" + optimal_pt)
     
 
@@ -134,12 +196,16 @@ if __name__ == "__main__":
     A = np.array(A, dtype='float')
     B = np.array(B, dtype='float')
     C = np.array(C, dtype='float')
+    extreme_pt = []
     print(A)
     print(B)
     print(C)
-#     N=3
-#     M=7
-#     A = [[-1 ,0,0],[0,-1,0],[0,0,-1],[1,0,0],[0,1,0],[0,0,1],[1,1,1]]
-#     B = [0,0,0,2,2,2,5]
-#     C= [1,1,-1]
-#     Simplex(N, M, A,B,C)
+    # N=3
+    # M=7
+    # A = [[-1 ,0,0],[0,-1,0],[0,0,-1],[1,0,0],[0,1,0],[0,0,1],[1,1,1]]
+    # B = [0,0,0,2,2,2,-5]
+    # C= [1,1,-1]
+    
+
+ 
+    Simplex(N, M, A,B,C)
