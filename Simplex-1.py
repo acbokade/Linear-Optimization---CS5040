@@ -3,7 +3,7 @@ import numpy as np
 def simplex_phase1(N, M, A, B, C) : 
     # fill the code here and remove the return below
     for i in range(M):
-        A.append(B[i])
+        A[i].append(B[i])
     X=[0]*N
     X.append(1)
     T=X
