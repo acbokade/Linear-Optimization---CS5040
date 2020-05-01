@@ -1,3 +1,15 @@
+        #####################################################################################
+        #              CS5040 - Linear Optimization                                         #
+        #            Simplex Algorithm ( Non-degenerate )                                   #    
+        #                                                                                   #    
+        #              Ajinkya Bokade - CS17BTECH11001                                      #
+        #             Shivashish Suman - CS17BTECH11037                                     #
+        #            Rushikesh Tammewar - CS17BTECH11041                                    #
+        #                                                                                   #
+        #####################################################################################                                                                                   #    
+
+
+
 import numpy as np
 
 def simplex_phase1(N, M, A, B, C) : 
@@ -7,7 +19,7 @@ def simplex_phase1(N, M, A, B, C) :
         arr.append(i)
     data = [0]*N
     global extreme_pt
-    combinationUtil(arr, data, 0,M - 1, 0, N, N, M, A, B, C);
+    combinationUtil(arr, data, 0,M - 1, 0, N, N, M, A, B, C)
     return extreme_pt
 
 
@@ -67,12 +79,11 @@ def combinationUtil(arr, data, start,
     # index will make a combination  
     # with remaining elements at  
     # remaining positions 
-    i = start;  
+    i = start
     while(i <= end and end - i + 1 >= r - index): 
-        data[index] = arr[i]; 
-        combinationUtil(arr, data, i + 1,  
-                        end, index + 1, r, N, M, A, B, C); 
-        i += 1; 
+        data[index] = arr[i]
+        combinationUtil(arr, data, i + 1,  end, index + 1, r, N, M, A, B, C)
+        i += 1
 
 
 
@@ -95,12 +106,12 @@ def simplex_phase2(X,tight_constraints, N, M, A, B, C):
 
     while flag == -1 :
         index = -1
-        a_tight = []
-        b_tight = []
-        a_untight = []
-        b_untight = []
-        tight_index_map = {}
-        untight_index_map = {}
+        a_tight = []        # collection of tight rows
+        b_tight = []        # collection of values of b corresponding to tight rows
+        a_untight = []      # collection of untight rows
+        b_untight = []      # collection of values of b corresponding to untight rows
+        tight_index_map = {}   # map to store which rows are tight
+        untight_index_map = {}   # map to store which rows are untight
         tight_ind = 0
         untight_ind = 0
         for i in range(M):
@@ -133,15 +144,17 @@ def simplex_phase2(X,tight_constraints, N, M, A, B, C):
             break
         else :
             a_inverse = np.linalg.inv(a_tight)
-            dir_vect = -a_inverse[:,index]
+            dir_vect = -a_inverse[:,index]          # direction which increases the cost
+
+            #finding the untight row to replace with tight row 
             for i in range(b_untight.size):
                 val = np.dot(a_untight[i],dir_vect)
                 if val<=0:
                     continue
-                temp = (b_untight[i] - np.dot(a_untight[i],X))/val
+                temp = (b_untight[i] - np.dot(a_untight[i],X))/val 
                 if t>temp:
                     t=temp
-                    index_replace=i
+                    index_replace=i    
             X=X+dir_vect*t
             tight_constraints[untight_index_map[index_replace]] = True # untight becomes tight
             tight_constraints[tight_index_map[index]] = False # tight becomes untight
@@ -171,8 +184,9 @@ def Simplex(N, M, A, B, C):
     tight_constraints = check_tight(N,M,A,B,X)
     
     optimal_pt =  simplex_phase2(X,tight_constraints, N, M, A, B, C)
-    print (optimal_pt,C)
-#     print("Optimal Cost is" + np.dot(C,optimal_pt) + " at :" + optimal_pt)
+    #print (optimal_pt,C)
+    print("Optimal Cost is " + str(np.dot(C,optimal_pt)) + " at :" )
+    print(optimal_pt)
     
 
 
@@ -196,10 +210,6 @@ if __name__ == "__main__":
     A = np.array(A, dtype='float')
     B = np.array(B, dtype='float')
     C = np.array(C, dtype='float')
-    extreme_pt = []
-    print(A)
-    print(B)
-    print(C)
     # N=3
     # M=7
     # A = [[-1 ,0,0],[0,-1,0],[0,0,-1],[1,0,0],[0,1,0],[0,0,1],[1,1,1]]

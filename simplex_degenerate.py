@@ -1,3 +1,14 @@
+        #####################################################################################
+        #              CS5040 - Linear Optimization                                         #
+        #            Simplex Algorithm ( Degenerate )                                       #    
+        #                                                                                   #    
+        #              Ajinkya Bokade - CS17BTECH11001                                      #
+        #             Shivashish Suman - CS17BTECH11037                                     #
+        #            Rushikesh Tammewar - CS17BTECH11041                                    #
+        #                                                                                   #
+        #####################################################################################                 
+
+
 import numpy as np
 
 isDegenerate = False
