@@ -17,16 +17,17 @@ isDegenerate = False
 
 
 def simplex_phase1(N, M, A, B, C):
-    arr = []
+    arr = []                                                                #  Returns First Extreme Point                                                 
     for i in range(M):
         arr.append(i)
     data = [0]*N
     global extreme_pt
-    combinationUtil(arr, data, 0, M - 1, 0, N, N, M, A, B, C)
-    return extreme_pt
+    combinationUtil(arr, data, 0, M - 1, 0, N, N, M, A, B, C)               #  recursively finds out which N constraints are 
+    return extreme_pt                                                       #  independent and feasible.
 
 
-def isvalid(data, N, M, A, B, C):
+
+def isvalid(data, N, M, A, B, C):                 # checks  weather given N constraints are indepndent and Feasible.
     global extreme_pt
     mat = []
     tempb = []
@@ -36,46 +37,30 @@ def isvalid(data, N, M, A, B, C):
     mat = np.array(mat, dtype='float')
     tempb = np.array(tempb, dtype='float')
 
-    # print(mat)
     if abs(np.linalg.det(mat)-0) < 1e-5:
         return (False)
 
     matinverse = np.linalg.inv(mat)
     sol = np.dot(matinverse, tempb)
     tempmul = np.dot(A, sol)
-    # print(tempmul)
+
     for i in range(M):
         if (B[i]-tempmul[i] < 0):
             return False
-    extreme_pt = sol
-    return (True)
+    extreme_pt = sol                        # intersection of N independent Feasible constraint
+    return (True)                           # is assigned as extreme point. 
 
 
 def combinationUtil(arr, data, start,
-                    end, index, r, N, M, A, B, C):
-
-    # Current combination is ready
-    # to be printed, print it
+                    end, index, r, N, M, A, B, C):     # All combinations N out of M constraint are verified recursively.
     global extreme_pt
-    print("Extreme pt is "+str(extreme_pt))
     if len(extreme_pt) != 0:
         return
 
     if index == r:
-        # print(data)
-        # print("end\n")
         isvalid(data, N, M, A, B, C)
-        # print()
         return
 
-    # replace index with all
-    # possible elements. The
-    # condition "end-i+1 >=
-    # r-index" makes sure that
-    # including one element at
-    # index will make a combination
-    # with remaining elements at
-    # remaining positions
     i = start
     while(i <= end and end - i + 1 >= r - index):
         data[index] = arr[i]
@@ -84,7 +69,7 @@ def combinationUtil(arr, data, start,
         i += 1
 
 
-def check_tight(N, M, A, B, X):
+def check_tight(N, M, A, B, X):          # returns boolean list of tight and untight constraint
     tight = []
     for i in range(M):
         temp = 0
@@ -212,20 +197,6 @@ def Simplex(N, M, A, B, C):
 
     # find initial feasible solution
     # X is initial point and tight_constraints is boolean vector indicating which constraints are tight
-    print(A)
-    print(B)
-    print(C)
-    # trivial = 1
-    # for i in range(M):
-    #     if B[i] < 0:
-    #         trivial = 0
-    # if trivial == 1:
-    #     X = [0]*N
-    # else:
-    #     X = simplex_phase1(N, M, A, B, C)
-    #     if (len(X) == 0):
-    #         print("Original problem is infeasible")
-    #         return
 
     X = simplex_phase1(N, M, A, B, C)
     if (len(X) == 0):
@@ -255,13 +226,4 @@ if __name__ == "__main__":
     B = np.array(B, dtype='float')
     C = np.array(C, dtype='float')
     extreme_pt = []
-    # print(A)
-    # print(B)
-    # print(C)
-    # N=3
-    # M=7
-    # A = [[-1 ,0,0],[0,-1,0],[0,0,-1],[1,0,0],[0,1,0],[0,0,1],[1,1,1]]
-    # B = [0,0,0,2,2,2,-5]
-    # C= [1,1,-1]
-
     Simplex(N, M, A, B, C)
