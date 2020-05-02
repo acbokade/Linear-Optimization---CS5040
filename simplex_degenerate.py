@@ -147,9 +147,11 @@ def simplex_phase2(X, tight_constraints, N, M, A, B, C):
                 val = np.dot(a_untight[i], dir_vect)
                 # if cost is increasing in direction vector and no constraint is becoming tight,
                 # it means it is unbounded solution
-                if val <= 0:
+                if val < 0:
                     isUnbounded = True
                     break
+                if val == 0:
+                    continue
                 temp = (b_untight[i] - np.dot(a_untight[i], X))/val
                 if t > temp:
                     t = temp
@@ -163,9 +165,9 @@ def simplex_phase2(X, tight_constraints, N, M, A, B, C):
             increase_in_tight_rows = 0
             for i in range(b_untight.size):
                 val = np.dot(a_untight[i], dir_vect)
+                if val == 0:
+                    continue
                 temp = (b_untight[i] - np.dot(a_untight[i], X))/val
-                # if t == temp:
-                #     increase_in_tight_rows += 1
                 if abs(t-temp) <= 1e-05:
                     increase_in_tight_rows += 1
 
