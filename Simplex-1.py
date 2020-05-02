@@ -82,7 +82,6 @@ def check_tight(N,M,A,B,X):    # returns boolean list of tight and untight const
     return tight       
 
 def simplex_phase2(X,tight_constraints, N, M, A, B, C):
-    optimal_cost = np.dot(C,X)
     flag = -1
 
     while flag == -1 :
