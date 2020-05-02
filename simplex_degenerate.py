@@ -76,7 +76,7 @@ def check_tight(N, M, A, B, X):          # returns boolean list of tight and unt
         temp = 0
         for j in range(N):
             temp = temp + A[i][j]*X[j]
-        if temp == B[i]:
+        if abs(temp - B[i]) < 1e-5:
             tight.append(True)
         else:
             tight.append(False)
