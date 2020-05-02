@@ -145,21 +145,19 @@ def simplex_phase2(X, tight_constraints, N, M, A, B, C):
             # finding the untight row to replace with tight row
             for i in range(b_untight.size):
                 val = np.dot(a_untight[i], dir_vect)
-                # if cost is increasing in direction vector and no constraint is becoming tight,
-                # it means it is unbounded solution
-                if val < 0:
-                    isUnbounded = True
-                    break
-                if val == 0:
+                if val <= 0:
                     continue
                 temp = (b_untight[i] - np.dot(a_untight[i], X))/val
                 if t > temp:
                     t = temp
                     index_replace = i
                         
-            if isUnbounded:
+            # if no untight row is becoming tight and cost is increasing
+            # in the direction of direction vector, then it has unbounded solution
+            if t == 1e18:
+                isUnbounded = True
                 print("Unbounded Solution")
-                break
+                break 
             # degenerate case when more than 1 row is becoming tight
             # that is more than n tight rows
             increase_in_tight_rows = 0
