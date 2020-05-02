@@ -216,13 +216,13 @@ if __name__ == "__main__":
     M = int(input("Enter the number of constraints (m):"))
 
     print("Enter the matrix A row-wise:")
-    A = [[j for j in raw_input().strip().split(" ")] for i in range(M)]
+    A = [[j for j in input().strip().split(" ")] for i in range(M)]
 
     print("Enter the elements of B separated by space:")
-    B = [j for j in raw_input().strip().split(" ")]
+    B = [j for j in input().strip().split(" ")]
 
     print("Enter the elements of C separated by space:")
-    C = [j for j in raw_input().strip().split(" ")]
+    C = [j for j in input().strip().split(" ")]
 
     A = np.array(A, dtype='float')
     B = np.array(B, dtype='float')
