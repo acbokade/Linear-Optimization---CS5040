@@ -10,10 +10,11 @@
 
 
 import numpy as np
-
+# boolean global variable for degenerate case
 isDegenerate = False
 
-# unbounded left
+# boolean global variable for unbounded solution
+isUnbounded = False
 
 
 def simplex_phase1(N, M, A, B, C):
@@ -88,12 +89,12 @@ def simplex_phase2(X, tight_constraints, N, M, A, B, C):
 
     while flag == -1:
         index = -1
-        a_tight = []
-        b_tight = []
-        a_untight = []
-        b_untight = []
-        tight_index_map = {}
-        untight_index_map = {}
+        a_tight = []        # collection of tight rows
+        b_tight = []        # collection of values of b corresponding to tight rows
+        a_untight = []      # collection of untight rows
+        b_untight = []      # collection of values of b corresponding to untight rows
+        tight_index_map = {}   # map to store which rows are tight
+        untight_index_map = {}   # map to store which rows are untight
         tight_ind = 0
         untight_ind = 0
         for i in range(M):
@@ -112,26 +113,21 @@ def simplex_phase2(X, tight_constraints, N, M, A, B, C):
         a_untight = np.array(a_untight, dtype='float')
         b_tight = np.array(b_tight, dtype='float')
         b_untight = np.array(b_untight, dtype='float')
-
-        print("a_tight is "+str(a_tight))
         global extreme_pt
         global isDegenerate
+        global isUnbounded
         # degenerate case
         if len(a_tight) > N:
             extreme_pt = []
             isDegenerate = True
             epsilon = 1e-5
-            # adding infinitesimally small epsilon to b vector
+            # perturbing b vector, adding infinitesimally small epsilon to b vector
             for i in range(len(B)):
                 B[i] = B[i] + epsilon ** (i+1)
                 # solving new problem using simplex since its non degenerate
             X = Simplex(N, M, A, B, C)
             # flag = 1
             break
-
-        print("shape of a_tight is " + str(a_tight))
-        print("shape of c is "+str(C))
-        print("X is "+str(X))
         alpha = np.matmul(np.linalg.inv(np.transpose(a_tight)), C)
         t = 1e18
         index_replace = -1
@@ -145,16 +141,24 @@ def simplex_phase2(X, tight_constraints, N, M, A, B, C):
             break
         else:
             a_inverse = np.linalg.inv(a_tight)
+            # direction which increases the cost
             dir_vect = -a_inverse[:, index]
+            # finding the untight row to replace with tight row
             for i in range(b_untight.size):
                 val = np.dot(a_untight[i], dir_vect)
+                # if cost is increasing in direction vector and no constraint is becoming tight,
+                # it means it is unbounded solution
                 if val <= 0:
-                    continue
+                    isUnbounded = True
+                    break
                 temp = (b_untight[i] - np.dot(a_untight[i], X))/val
                 if t > temp:
                     t = temp
                     index_replace = i
-
+                        
+            if isUnbounded:
+                print("Unbounded Solution")
+                break
             # degenerate case when more than 1 row is becoming tight
             # that is more than n tight rows
             increase_in_tight_rows = 0
@@ -171,12 +175,11 @@ def simplex_phase2(X, tight_constraints, N, M, A, B, C):
                 extreme_pt = []
                 isDegenerate = True
                 epsilon = 1e-5
-                # adding infinitesimally small epsilon to b vector
+                # perturbing b vector, adding infinitesimally small epsilon to b vector
                 for i in range(len(B)):
                     B[i] = B[i] + epsilon ** (i+1)
                 # solving new problem using simplex since its non degenrate
                 X = Simplex(N, M, A, B, C)
-                # flag = 1
                 break
 
             X = X+dir_vect*t
@@ -197,8 +200,8 @@ def Simplex(N, M, A, B, C):
 
     # find initial feasible solution
     # X is initial point and tight_constraints is boolean vector indicating which constraints are tight
-
     X = simplex_phase1(N, M, A, B, C)
+    # if no n linearly independent tight constraints are found, then solution is infeasible
     if (len(X) == 0):
         print("Original problem is infeasible")
         return
