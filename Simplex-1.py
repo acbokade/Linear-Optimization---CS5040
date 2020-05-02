@@ -12,6 +12,9 @@
 
 import numpy as np
 
+# boolean global variable for unbounded solution
+isUnbounded = False     
+
 def simplex_phase1(N, M, A, B, C) :                           #  Returns First Extreme Point               
     arr=[]
     for i in range(M):
@@ -71,7 +74,7 @@ def check_tight(N,M,A,B,X):    # returns boolean list of tight and untight const
         temp = 0
         for j in range(N):
             temp = temp +A[i][j]*X[j]
-        if temp ==B[i]:
+        if abs(temp - B[i]) < 1e-5:
             tight.append(True)
         else:
             tight.append(False)
@@ -108,6 +111,7 @@ def simplex_phase2(X,tight_constraints, N, M, A, B, C):
         a_untight = np.array(a_untight, dtype='float')
         b_tight = np.array(b_tight, dtype='float')
         b_untight = np.array(b_untight, dtype='float')
+        global isUnbounded
         
         alpha = np.matmul(np.linalg.inv(np.transpose(a_tight)),C)
         t = 1e18
@@ -127,12 +131,20 @@ def simplex_phase2(X,tight_constraints, N, M, A, B, C):
             #finding the untight row to replace with tight row 
             for i in range(b_untight.size):
                 val = np.dot(a_untight[i],dir_vect)
-                if val<=0:
-                    continue
+                # if cost is increasing in direction vector and no constraint is becoming tight,
+                # it means it is unbounded solution
+                if val <= 0:
+                    isUnbounded = True
+                    break
                 temp = (b_untight[i] - np.dot(a_untight[i],X))/val 
                 if t>temp:
                     t=temp
-                    index_replace=i    
+                    index_replace=i
+                        
+            if isUnbounded:
+                print("Unbounded Solution")
+                break     
+                   
             X=X+dir_vect*t
             tight_constraints[untight_index_map[index_replace]] = True # untight becomes tight
             tight_constraints[tight_index_map[index]] = False # tight becomes untight
@@ -145,9 +157,8 @@ def Simplex(N, M, A, B, C):
 
     # find initial feasible solution
     # X is initial Extreme point and tight_constraints is boolean vector indicating which constraints are tight 
-
     X= simplex_phase1(N, M, A, B, C) 
-    
+    # if no n linearly independent tight constraints are found, then solution is infeasible
     if (len(X)==0):
         print("Original problem is infeasible")
         return
