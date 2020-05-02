@@ -1,0 +1,52 @@
+max 	x1+x2+x3
+s.t 	x1+x2<=8
+	-x2+x3<=0
+	x1>=0
+	x2>=0
+	x3>=0
+optimal at (0,8,8) cost 16
+
+max 	2x1+x2
+s.t	4x1+3x2<=12
+	4x1+x2<=8
+	4x1-x2<=8
+	x1>=0
+	x2>=0
+optimal at (1.5,2) cost 5
+
+max	3x1+2x2
+s.t	2x1+x2<=2
+	3x1+4x2>=12
+	x1>=0
+	x2>=0
+infeasible solution
+
+max	x1+x2+x3
+s.t	x1+x2<=1
+	-x2+x3<=0
+	x1>=0
+	x2>=0
+	x3>=0
+optimal at (0,1,1) cost 2
+
+max	2x1+x2
+s.t	-x1+x2<=10
+	-2x1<=40
+	x1>=0
+	x2>=0
+unbounded solution
+
+max	5x1+4x2
+s.t	x1<=7
+	x1-x2<=8
+	x1>=0
+	x2>=0
+unbounded solution
+
+max 	10x1+20x2	
+s.t	2x1+3x2>=6
+	4x1+x2<=4
+	x1>=0
+	x2>=0
+unbounded solution
+
