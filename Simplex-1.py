@@ -166,6 +166,8 @@ def Simplex(N, M, A, B, C):
     #Simplex phase 2 returns optimal point 
     optimal_pt =  simplex_phase2(X,tight_constraints, N, M, A, B, C)
 
+    if isUnbounded :
+        return
     print("Optimal Cost is " + str(np.dot(C,optimal_pt)) + " at :" )
     print(optimal_pt)
     
